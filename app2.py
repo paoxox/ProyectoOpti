@@ -86,9 +86,9 @@ res_actual = evaluar_hds(t_in, epsilon, m_dot, s_in, cp, ea, k0, tau)
 
 st.subheader("Punto operativo seleccionado")
 if res_actual["factible"]:
-    st.success(f"Cumple especificación de calidad: Sout = {res_actual['Sout_ppm']:.2f} ppm (≤ 10 ppm).")
+    st.success(f"Cumple especificación de calidad: $S_{out}$ = {res_actual['Sout_ppm']:.2f} ppm (≤ 10 ppm).")
 else:
-    st.warning(f"No cumple especificación de calidad: Sout = {res_actual['Sout_ppm']:.2f} ppm (> 10 ppm).")
+    st.warning(f"No cumple especificación de calidad: $S_{out}$ = {res_actual['Sout_ppm']:.2f} ppm (> 10 ppm).")
 
 c1, c2, c3, c4 = st.columns(4)
 c1.metric("Conversión Xs", f"{res_actual['Xs']*100:.2f}%")
