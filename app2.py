@@ -90,11 +90,12 @@ if res_actual["factible"]:
 else:
     st.warning(f"No cumple especificación de calidad: Sout = {res_actual['Sout_ppm']:.2f} ppm (> 10 ppm).")
 
+# Ajuste en las etiquetas para que no se trunquen y se vean limpias
 c1, c2, c3, c4 = st.columns(4)
-c1.metric("Conversión Xs", f"{res_actual['Xs']*100:.2f}%")
-c2.metric("Azufre salida Sout", f"{res_actual['Sout_ppm']:.2f} ppm", delta_color="inverse")
-c3.metric("Carga horno Q_horno", f"{res_actual['Q_horno_kW']:.2f} kW")
-c4.metric("Carga horno Q_horno", f"{res_actual['Q_horno_kJ_h']:,.0f} kJ/h")
+c1.metric("Conversión Xs (%)", f"{res_actual['Xs']*100:.2f}%")
+c2.metric("Azufre salida Sout (ppm)", f"{res_actual['Sout_ppm']:.2f}")
+c3.metric("Carga horno Q_horno (kW)", f"{res_actual['Q_horno_kW']:.2f}")
+c4.metric("Carga horno Q_horno (kJ/h)", f"{res_actual['Q_horno_kJ_h']/1e6:.2f} M") # Formateado a millones para que no se corte
 
 st.markdown("---")
 
@@ -102,13 +103,11 @@ st.markdown("---")
 @st.cache_data
 def calcular_malla_y_pareto(n_puntos=50, m_dot=100000.0, s_in=500.0, cp=2.5, ea=EA_CALIB, k0=None, tau=TAU_CALIB):
     """Genera el dominio completo usando vectorización de NumPy (Rápido)."""
-    # Crear malla de 2500 puntos
     grid_tin = np.linspace(550.0, 650.0, n_puntos)
     grid_eps = np.linspace(0.60, 0.90, n_puntos)
     T_grid, E_grid = np.meshgrid(grid_tin, grid_eps)
     T_flat, E_flat = T_grid.flatten(), E_grid.flatten()
 
-    # Evaluar TODA la malla de una sola vez (Vectorización)
     res = evaluar_hds(t_in=T_flat, epsilon=E_flat, m_dot=m_dot, s_in=s_in, cp=cp, ea=ea, k0=k0, tau=tau)
     
     df_grid = pd.DataFrame(res)
@@ -117,7 +116,6 @@ def calcular_malla_y_pareto(n_puntos=50, m_dot=100000.0, s_in=500.0, cp=2.5, ea=
     if df_factible.empty:
         return df_grid, pd.DataFrame(), None
 
-    # Filtrado de la Frontera de Pareto
     df_factible["obj_xs"] = 1.0 - df_factible["Xs"]
     df_factible["obj_q"] = df_factible["Q_horno_kW"]
     df_sorted = df_factible.sort_values(by=["obj_xs", "obj_q"], ascending=[True, True]).reset_index(drop=True)
@@ -131,7 +129,6 @@ def calcular_malla_y_pareto(n_puntos=50, m_dot=100000.0, s_in=500.0, cp=2.5, ea=
 
     df_pareto = df_sorted.loc[pareto_indices].copy()
 
-    # Cálculo del Knee Point
     xs_min, xs_max = df_pareto["obj_xs"].min(), df_pareto["obj_xs"].max()
     q_min, q_max = df_pareto["obj_q"].min(), df_pareto["obj_q"].max()
 
@@ -179,22 +176,25 @@ with tab_pareto:
             df_fact = df_grid[df_grid["factible"]]
             df_infact = df_grid[~df_grid["factible"]]
 
-            # Puntos Infactibles
+            # Puntos Infactibles (Gris muy tenue)
             fig.add_trace(go.Scatter(x=df_infact["Q_horno_kW"], y=df_infact["Xs"]*100, mode="markers",
-                                     name="Infactibles (Sout > 10)", marker=dict(color="lightgray", size=4, opacity=0.3)))
-            # Puntos Factibles
+                                     name="Infactibles (Sout > 10)", marker=dict(color="rgba(200, 200, 200, 0.3)", size=4)))
+            
+            # Puntos Factibles (Azul claro)
             fig.add_trace(go.Scatter(x=df_fact["Q_horno_kW"], y=df_fact["Xs"]*100, mode="markers",
-                                     name="Factibles", marker=dict(color="lightskyblue", size=5, opacity=0.6),
+                                     name="Factibles", marker=dict(color="#A0C4FF", size=5, opacity=0.6),
                                      hovertemplate="Q: %{x:.1f} kW<br>Xs: %{y:.2f}%<br>Tin: %{customdata[0]:.1f} K<br>ε: %{customdata[1]:.2f}<extra></extra>",
                                      customdata=df_fact[["Tin_K", "epsilon"]].values))
-            # Frontera
+            
+            # Frontera de Pareto (Azul oscuro sólido)
             fig.add_trace(go.Scatter(x=df_pareto["Q_horno_kW"], y=df_pareto["Xs"]*100, mode="lines+markers",
-                                     name="Frontera de Pareto", line=dict(color="royalblue", width=3),
+                                     name="Frontera de Pareto", line=dict(color="#023E8A", width=3), marker=dict(color="#023E8A", size=5),
                                      hovertemplate="<b>Pareto</b><br>Q: %{x:.1f} kW<br>Xs: %{y:.2f}%<br>Tin: %{customdata[0]:.1f} K<br>ε: %{customdata[1]:.2f}<extra></extra>",
                                      customdata=df_pareto[["Tin_K", "epsilon"]].values))
-            # Knee Point
+            
+            # Knee Point (Reemplazada la estrella por un rombo llamativo)
             fig.add_trace(go.Scatter(x=[knee_point["Q_horno_kW"]], y=[knee_point["Xs"]*100], mode="markers",
-                                     name="Knee Point", marker=dict(color="crimson", size=16, symbol="star", line=dict(color="black", width=1)),
+                                     name="Knee Point", marker=dict(color="#FF006E", size=14, symbol="diamond", line=dict(color="white", width=2)),
                                      hovertemplate="<b>Knee Point</b><br>Q: %{x:.1f} kW<br>Xs: %{y:.2f}%<extra></extra>"))
 
             fig.update_layout(title="Optimización Multiobjetivo", xaxis_title="Carga Térmica Q_horno (kW)",
@@ -204,11 +204,12 @@ with tab_pareto:
         with col_knee:
             st.markdown("### 📍 Knee Point (Rodilla)")
             st.info("Solución de compromiso óptima entre conversión y energía.")
-            st.metric("Temperatura Tin", f"{knee_point['Tin_K']:.1f} K", f"{knee_point['Tin_K']-273.15:.1f} °C")
+            # Etiquetas limpias y sin abreviaciones confusas
+            st.metric("Temperatura Tin (K)", f"{knee_point['Tin_K']:.1f}", f"{knee_point['Tin_K']-273.15:.1f} °C")
             st.metric("Efectividad ε", f"{knee_point['epsilon']:.2f}")
-            st.metric("Conversión Xs", f"{knee_point['Xs']*100:.3f}%")
-            st.metric("Sout", f"{knee_point['Sout_ppm']:.2f} ppm")
-            st.metric("Carga Horno", f"{knee_point['Q_horno_kW']:.2f} kW")
+            st.metric("Conversión Xs (%)", f"{knee_point['Xs']*100:.3f}%")
+            st.metric("Sout (ppm)", f"{knee_point['Sout_ppm']:.2f} ppm")
+            st.metric("Carga Horno Q_horno (kW)", f"{knee_point['Q_horno_kW']:.2f} kW")
 
 with tab_sanity:
     st.subheader("Sanity Checks (Valores Base)")
@@ -249,7 +250,6 @@ with tab_sensibilidad:
                 if clave == "epsilon": val_pert = min(max(val_pert, 0.0), 1.0)
                 kwargs[clave] = val_pert
                 
-                # Si se perturba Ea o tau, recalcular k0 para mantener la coherencia
                 if clave in ["ea", "tau"]: kwargs["k0"] = calcular_k0(kwargs["ea"], kwargs["tau"])
                 
                 res = evaluar_hds(**kwargs)
