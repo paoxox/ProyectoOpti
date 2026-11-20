@@ -212,8 +212,8 @@ with tab_sanity:
 
     # En tablas usamos caracteres Unicode para los subíndices (Xₛ, Sₒᵤₜ, Qₕₒᵣₙₒ) ya que Dataframe no lee HTML
     df_sanity = pd.DataFrame([
-        {"Caso": "1) $T_{in}$ = 650 K, ε = 0.90", "Xₛ": f"{sc1['Xs']:.4f}", "Sₒᵤₜ (ppm)": f"{sc1['Sout_ppm']:.4f}", "Factible": "Sí" if sc1["factible"] else "No", "Qₕₒᵣₙₒ (kW)": f"{sc1['Q_horno_kW']:.2f}"},
-        {"Caso": "2) $T_{{in}}$ = 550 K, ε = 0.75", "Xₛ": f"{sc2['Xs']:.4f}", "Sₒᵤₜ (ppm)": f"{sc2['Sout_ppm']:.4f}", "Factible": "Sí" if sc2["factible"] else "No", "Qₕₒᵣₙₒ (kW)": f"{sc2['Q_horno_kW']:.2f}"},
+        {"Caso": "1) Tin = 650 K, ε = 0.90", "Xₛ": f"{sc1['Xs']:.4f}", "Sₒᵤₜ (ppm)": f"{sc1['Sout_ppm']:.4f}", "Factible": "Sí" if sc1["factible"] else "No", "Qₕₒᵣₙₒ (kW)": f"{sc1['Q_horno_kW']:.2f}"},
+        {"Caso": "2) Tin = 550 K, ε = 0.75", "$X_{s}$": f"{sc2['Xs']:.4f}", "Sₒᵤₜ (ppm)": f"{sc2['Sout_ppm']:.4f}", "Factible": "Sí" if sc2["factible"] else "No", "Qₕₒᵣₙₒ (kW)": f"{sc2['Q_horno_kW']:.2f}"},
         {"Caso": "3) Límite ε → 1 (Tin = 600 K)", "Xₛ": f"{sc3['Xs']:.4f}", "Sₒᵤₜ (ppm)": f"{sc3['Sout_ppm']:.4f}", "Factible": "Sí" if sc3["factible"] else "No", "Qₕₒᵣₙₒ (kW)": f"{sc3['Q_horno_kW']:.2f}"},
     ])
     st.dataframe(df_sanity, use_container_width=True, hide_index=True)
