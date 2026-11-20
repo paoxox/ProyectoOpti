@@ -15,6 +15,7 @@ st.set_page_config(
         "About": "Sección interna de simulación, versión 1.0",
     },
 )
+st.title("Simulación y Optimización de HDS")
 
 # Configuración de logo y texto
 col_logo, col_titulo = st.columns([1, 8], vertical_alignment="center")
