@@ -3,7 +3,7 @@ import pandas as pd
 import streamlit as st
 import plotly.graph_objects as go
 
-Configuración general de la página
+# Configuración general de la página
 st.set_page_config(
     page_title="Simulación y Optimización de HDS",
     page_icon="⚗️",
