@@ -17,7 +17,7 @@ st.set_page_config(
 col_logo, col_titulo = st.columns([1, 8], vertical_alignment="center")
 with col_logo:
     # REEMPLAZA ESTA URL POR LA RUTA DE TU LOGO LOCAL (ej: "logo.png")
-    st.image("https://cdn-icons-png.flaticon.com/512/3063/3063822.png", width=90)
+    st.image("https://img.magnific.com/premium-photo/nuclear-power-plant-with-nuclear-reactor-illuminated-by-lights-middle-night_124507-45320.jpg?semt=ais_hybrid&w=740&q=80", width=90)
 with col_titulo:
     st.title("Simulación y Optimización de Hidrodesulfuración (HDS)")
     st.caption(
