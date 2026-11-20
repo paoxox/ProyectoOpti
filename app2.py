@@ -210,11 +210,10 @@ with tab_sanity:
     sc2 = evaluar_hds(t_in=550.0, epsilon=0.75, m_dot=100000.0, s_in=500.0, cp=2.5, ea=80000.0, k0=calcular_k0(80000.0, 0.5), tau=0.5)
     sc3 = evaluar_hds(t_in=600.0, epsilon=0.999999, m_dot=100000.0, s_in=500.0, cp=2.5, ea=80000.0, k0=calcular_k0(80000.0, 0.5), tau=0.5)
 
-    # En tablas usamos caracteres Unicode para los subíndices (Xₛ, Sₒᵤₜ, Qₕₒᵣₙₒ) ya que Dataframe no lee HTML
     df_sanity = pd.DataFrame([
-        {"Caso": "1) Tin = 650 K, ε = 0.90", "Xₛ": f"{sc1['Xs']:.4f}", "Sₒᵤₜ (ppm)": f"{sc1['Sout_ppm']:.4f}", "Factible": "Sí" if sc1["factible"] else "No", "Qₕₒᵣₙₒ (kW)": f"{sc1['Q_horno_kW']:.2f}"},
-        {"Caso": "2) Tin = 550 K, ε = 0.75", "$X_{s}$": f"{sc2['Xs']:.4f}", "Sₒᵤₜ (ppm)": f"{sc2['Sout_ppm']:.4f}", "Factible": "Sí" if sc2["factible"] else "No", "Qₕₒᵣₙₒ (kW)": f"{sc2['Q_horno_kW']:.2f}"},
-        {"Caso": "3) Límite ε → 1 (Tin = 600 K)", "Xₛ": f"{sc3['Xs']:.4f}", "Sₒᵤₜ (ppm)": f"{sc3['Sout_ppm']:.4f}", "Factible": "Sí" if sc3["factible"] else "No", "Qₕₒᵣₙₒ (kW)": f"{sc3['Q_horno_kW']:.2f}"},
+        {"Caso": "1) Tin = 650 K, ε = 0.90", "Xs": f"{sc1['Xs']:.4f}", "Sout (ppm)": f"{sc1['Sout_ppm']:.4f}", "Factible": "Sí" if sc1["factible"] else "No", "Qhorno (kW)": f"{sc1['Q_horno_kW']:.2f}"},
+        {"Caso": "2) Tin = 550 K, ε = 0.75", "Xs": f"{sc2['Xs']:.4f}", "Sout (ppm)": f"{sc2['Sout_ppm']:.4f}", "Factible": "Sí" if sc2["factible"] else "No", "Qhorno (kW)": f"{sc2['Q_horno_kW']:.2f}"},
+        {"Caso": "3) Límite ε → 1 (Tin = 600 K)", "Xs": f"{sc3['Xs']:.4f}", "Sout (ppm)": f"{sc3['Sout_ppm']:.4f}", "Factible": "Sí" if sc3["factible"] else "No", "Qhorno (kW)": f"{sc3['Q_horno_kW']:.2f}"},
     ])
     st.dataframe(df_sanity, use_container_width=True, hide_index=True)
     
@@ -234,7 +233,7 @@ with tab_sensibilidad:
         caso_base = evaluar_hds(t_in_base, eps_base, m_dot_base, s_in_base, cp_base, ea_base, k0_base, tau_base)
         parametros = [("Flujo másico (ṁ)", "m_dot", m_dot_base), ("Capacidad calorífica (Cp)", "cp", cp_base), 
                       ("Energía de activación (Ea)", "ea", ea_base), ("Factor preexponencial (k0)", "k0", k0_base),
-                      ("Tiempo espacial (tau)", "tau", tau_base), ("Efectividad (ε)", "epsilon", eps_base)]
+                      ("Tiempo espacial (τ)", "tau", tau_base), ("Efectividad (ε)", "epsilon", eps_base)]
         filas = []
         for nombre, clave, val_base in parametros:
             for factor, etiqueta in [(0.90, "-10%"), (1.10, "+10%")]:
