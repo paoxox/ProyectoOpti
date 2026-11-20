@@ -21,7 +21,7 @@ with col_titulo:
     st.title("Simulación y Optimización de Hidrodesulfuración (HDS)")
     st.caption(
         "Evaluación de conversión de azufre (Xs) y carga térmica del horno (Q_horno) "
-        "bajo restricción $S_{out}$ ≤ 10 ppm."
+        "bajo restricción Sout ≤ 10 ppm."
     )
 
 # Constantes fijas del modelo
@@ -54,7 +54,7 @@ def evaluar_hds(t_in, epsilon, m_dot, s_in, cp, ea, k0, tau):
 
     return {
         "Tin_K": t_in, "epsilon": epsilon, "k_h-1": k_t, "Xs": x_s,
-        "$S_{out}$_ppm": s_out, "factible": factible, "dT_ad_K": delta_t_ad,
+        "Sout_ppm": s_out, "factible": factible, "dT_ad_K": delta_t_ad,
         "T_efluente_K": t_efluente, "T_intercambiador_K": t_intercambiador,
         "Q_horno_kJ_h": q_horno_kjh, "Q_horno_kW": q_horno_kw,
     }
@@ -86,13 +86,13 @@ res_actual = evaluar_hds(t_in, epsilon, m_dot, s_in, cp, ea, k0, tau)
 
 st.subheader("Punto operativo seleccionado")
 if res_actual["factible"]:
-    st.success(f"Cumple especificación de calidad: $S_{out}$ = {res_actual['$S_{out}$_ppm']:.2f} ppm (≤ 10 ppm).")
+    st.success(f"Cumple especificación de calidad: Sout = {res_actual['Sout_ppm']:.2f} ppm (≤ 10 ppm).")
 else:
-    st.warning(f"No cumple especificación de calidad: $S_{out}$ = {res_actual['$S_{out}$_ppm']:.2f} ppm (> 10 ppm).")
+    st.warning(f"No cumple especificación de calidad: Sout = {res_actual['Sout_ppm']:.2f} ppm (> 10 ppm).")
 
 c1, c2, c3, c4 = st.columns(4)
 c1.metric("Conversión Xs", f"{res_actual['Xs']*100:.2f}%")
-c2.metric("Azufre salida $S_{out}$", f"{res_actual['$S_{out}$_ppm']:.2f} ppm", delta_color="inverse")
+c2.metric("Azufre salida Sout", f"{res_actual['Sout_ppm']:.2f} ppm", delta_color="inverse")
 c3.metric("Carga horno Q_horno", f"{res_actual['Q_horno_kW']:.2f} kW")
 c4.metric("Carga horno Q_horno", f"{res_actual['Q_horno_kJ_h']:,.0f} kJ/h")
 
@@ -181,7 +181,7 @@ with tab_pareto:
 
             # Puntos Infactibles
             fig.add_trace(go.Scatter(x=df_infact["Q_horno_kW"], y=df_infact["Xs"]*100, mode="markers",
-                                     name="Infactibles ($S_{out}$ > 10)", marker=dict(color="lightgray", size=4, opacity=0.3)))
+                                     name="Infactibles (Sout > 10)", marker=dict(color="lightgray", size=4, opacity=0.3)))
             # Puntos Factibles
             fig.add_trace(go.Scatter(x=df_fact["Q_horno_kW"], y=df_fact["Xs"]*100, mode="markers",
                                      name="Factibles", marker=dict(color="lightskyblue", size=5, opacity=0.6),
@@ -207,7 +207,7 @@ with tab_pareto:
             st.metric("Temperatura Tin", f"{knee_point['Tin_K']:.1f} K", f"{knee_point['Tin_K']-273.15:.1f} °C")
             st.metric("Efectividad ε", f"{knee_point['epsilon']:.2f}")
             st.metric("Conversión Xs", f"{knee_point['Xs']*100:.3f}%")
-            st.metric("$S_{out}$", f"{knee_point['$S_{out}$_ppm']:.2f} ppm")
+            st.metric("Sout", f"{knee_point['Sout_ppm']:.2f} ppm")
             st.metric("Carga Horno", f"{knee_point['Q_horno_kW']:.2f} kW")
 
 with tab_sanity:
@@ -218,9 +218,9 @@ with tab_sanity:
     sc3 = evaluar_hds(t_in=600.0, epsilon=0.999999, m_dot=100000.0, s_in=500.0, cp=2.5, ea=80000.0, k0=calcular_k0(80000.0, 0.5), tau=0.5)
 
     df_sanity = pd.DataFrame([
-        {"Caso": "1) Tin = 650 K, ε = 0.90", "Xs": f"{sc1['Xs']:.4f}", "$S_{out}$ (ppm)": f"{sc1['$S_{out}$_ppm']:.4f}", "Factible": "Sí" if sc1["factible"] else "No", "Q_horno (kW)": f"{sc1['Q_horno_kW']:.2f}"},
-        {"Caso": "2) Tin = 550 K, ε = 0.75", "Xs": f"{sc2['Xs']:.4f}", "$S_{out}$ (ppm)": f"{sc2['$S_{out}$_ppm']:.4f}", "Factible": "Sí" if sc2["factible"] else "No", "Q_horno (kW)": f"{sc2['Q_horno_kW']:.2f}"},
-        {"Caso": "3) Límite ε → 1 (Tin = 600 K)", "Xs": f"{sc3['Xs']:.4f}", "$S_{out}$ (ppm)": f"{sc3['$S_{out}$_ppm']:.4f}", "Factible": "Sí" if sc3["factible"] else "No", "Q_horno (kW)": f"{sc3['Q_horno_kW']:.2f}"},
+        {"Caso": "1) Tin = 650 K, ε = 0.90", "Xs": f"{sc1['Xs']:.4f}", "Sout (ppm)": f"{sc1['Sout_ppm']:.4f}", "Factible": "Sí" if sc1["factible"] else "No", "Q_horno (kW)": f"{sc1['Q_horno_kW']:.2f}"},
+        {"Caso": "2) Tin = 550 K, ε = 0.75", "Xs": f"{sc2['Xs']:.4f}", "Sout (ppm)": f"{sc2['Sout_ppm']:.4f}", "Factible": "Sí" if sc2["factible"] else "No", "Q_horno (kW)": f"{sc2['Q_horno_kW']:.2f}"},
+        {"Caso": "3) Límite ε → 1 (Tin = 600 K)", "Xs": f"{sc3['Xs']:.4f}", "Sout (ppm)": f"{sc3['Sout_ppm']:.4f}", "Factible": "Sí" if sc3["factible"] else "No", "Q_horno (kW)": f"{sc3['Q_horno_kW']:.2f}"},
     ])
     st.dataframe(df_sanity, use_container_width=True, hide_index=True)
     
@@ -254,11 +254,11 @@ with tab_sensibilidad:
                 
                 res = evaluar_hds(**kwargs)
                 delta_q_pct = ((res["Q_horno_kW"] - caso_base["Q_horno_kW"]) / abs(caso_base["Q_horno_kW"]) * 100.0) if abs(caso_base["Q_horno_kW"]) > 1e-9 else 0.0
-                delta_s_pct = ((res["$S_{out}$_ppm"] - caso_base["$S_{out}$_ppm"]) / caso_base["$S_{out}$_ppm"] * 100.0) if caso_base["$S_{out}$_ppm"] > 0 else 0.0
+                delta_s_pct = ((res["Sout_ppm"] - caso_base["Sout_ppm"]) / caso_base["Sout_ppm"] * 100.0) if caso_base["Sout_ppm"] > 0 else 0.0
 
                 filas.append({"Parámetro": nombre, "Perturbación": etiqueta, "Valor": f"{val_pert:.4g}", 
                               "Q_horno (kW)": round(res["Q_horno_kW"], 2), "ΔQ (%)": round(delta_q_pct, 2),
-                              "$S_{out}$ (ppm)": round(res["$S_{out}$_ppm"], 3), "Δ$S_{out}$ (%)": round(delta_s_pct, 2), "Factible": "Sí" if res["factible"] else "No"})
+                              "Sout (ppm)": round(res["Sout_ppm"], 3), "ΔSout (%)": round(delta_s_pct, 2), "Factible": "Sí" if res["factible"] else "No"})
         return pd.DataFrame(filas)
 
     df_sens = calcular_sensibilidad(t_in, epsilon, m_dot, s_in, cp, ea, k0, tau)
