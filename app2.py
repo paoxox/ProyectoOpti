@@ -59,13 +59,13 @@ def evaluar_hds(t_in, epsilon, m_dot, s_in, cp, ea, k0, tau):
 # 2. Controles en barra lateral
 with st.sidebar:
     st.header("Variables de decisión")
-    t_in = st.slider("Temperatura entrada reactor Tin (K)", 550.0, 650.0, 600.0, 1.0)
+    t_in = st.slider("Temperatura entrada reactor $T_{in}$(K)", 550.0, 650.0, 600.0, 1.0)
     epsilon = st.slider("Efectividad intercambiador ε", 0.60, 0.90, 0.75, 0.01)
 
     st.header("Parámetros del modelo")
     m_dot = st.number_input("Flujo másico ṁ (kg/h)", 90000.0, 110000.0, 100000.0, 1000.0)
-    s_in = st.number_input("Azufre alimentación Sin (ppm)", 450.0, 550.0, 500.0, 5.0)
-    cp = st.number_input("Capacidad calorífica Cp (kJ/(kg·K))", 2.25, 2.75, 2.50, 0.05)
+    s_in = st.number_input("Azufre alimentación $S_{in}$ (ppm)", 450.0, 550.0, 500.0, 5.0)
+    cp = st.number_input("Capacidad calorífica $Cp_{}$ (kJ/(kg·K))", 2.25, 2.75, 2.50, 0.05)
     ea = st.number_input("Energía de activación Ea (J/mol)", 72000.0, 88000.0, 80000.0, 500.0)
     tau = st.number_input("Tiempo espacial τ (h)", 0.45, 0.55, 0.50, 0.01)
 
