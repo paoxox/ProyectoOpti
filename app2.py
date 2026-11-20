@@ -3,7 +3,7 @@ import pandas as pd
 import streamlit as st
 import plotly.graph_objects as go
 
-# 1. Configuración general de la página
+Configuración general de la página
 st.set_page_config(
     page_title="Simulación y Optimización de HDS",
     page_icon="⚗️",
@@ -11,17 +11,15 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# ==========================================
-# CABECERA CON LOGO
-# ==========================================
+# Configuración de logo y texto
 col_logo, col_titulo = st.columns([1, 8], vertical_alignment="center")
 with col_logo:
     st.image("https://img.magnific.com/premium-photo/nuclear-power-plant-with-nuclear-reactor-illuminated-by-lights-middle-night_124507-45320.jpg?semt=ais_hybrid&w=740&q=80", width=90)
 with col_titulo:
     st.title("Simulación y Optimización de Hidrodesulfuración (HDS)")
     st.caption(
-        "Evaluación de conversión de azufre ($X_{s}$) y carga térmica del horno ($Q_{horno}$) "
-        "bajo restricción de Azufre en la salida($S_{out}$) ≤ 10 ppm."
+        "### Evaluación de conversión de azufre ($X_{s}$) y carga térmica del horno ($Q_{horno}$) "
+        "### bajo restricción de Azufre en la salida($S_{out}$) ≤ 10 ppm."
     )
 
 # Constantes fijas del modelo
@@ -56,7 +54,7 @@ def evaluar_hds(t_in, epsilon, m_dot, s_in, cp, ea, k0, tau):
         "Q_horno_kJ_h": q_horno_kjh, "Q_horno_kW": q_horno_kw,
     }
 
-# 2. Controles en barra lateral
+# Controles en barra lateral
 with st.sidebar:
     st.header("Variables de decisión")
     t_in = st.slider("Temperatura entrada reactor $T_{in}$(K)", 550.0, 650.0, 600.0, 1.0)
@@ -78,7 +76,7 @@ with st.sidebar:
         format="%.4e",
     )
 
-# 3. Evaluación del punto actual (Sidebar)
+# Evaluación del punto actual (Sidebar)
 res_actual = evaluar_hds(t_in, epsilon, m_dot, s_in, cp, ea, k0, tau)
 
 st.subheader("Punto operativo seleccionado")
@@ -87,7 +85,7 @@ if res_actual["factible"]:
 else:
     st.warning(f"No cumple especificación de calidad: $S_{{out}}$  = {res_actual['Sout_ppm']:.2f} ppm (> 10 ppm).", icon="⚠️")
 
-# Etiquetas con subíndices HTML (formato exacto de la imagen)
+# Etiquetas con subíndices HTML
 c1, c2, c3, c4 = st.columns(4)
 c1.metric("Conversión $X_{s}$", f"{res_actual['Xs']*100:.2f}%")
 c2.metric("Azufre salida $S_{out}$", f"{res_actual['Sout_ppm']:.2f} ppm", delta_color="inverse")
@@ -96,7 +94,7 @@ c4.metric("Carga horno $Q_{horno}$", f"{res_actual['Q_horno_kJ_h']:,.0f} kJ/h") 
 
 st.markdown("---")
 
-# 4. Generación de la Malla (Grid Search) y Pareto VECTORIZADO
+# Generación de la Malla (Grid Search) y Pareto VECTORIZADO
 @st.cache_data
 def calcular_malla_y_pareto(n_puntos=50, m_dot=100000.0, s_in=500.0, cp=2.5, ea=EA_CALIB, k0=None, tau=TAU_CALIB):
     grid_tin = np.linspace(550.0, 650.0, n_puntos)
@@ -155,9 +153,9 @@ def calcular_malla_y_pareto(n_puntos=50, m_dot=100000.0, s_in=500.0, cp=2.5, ea=
 
 df_grid, df_pareto, knee_point = calcular_malla_y_pareto(m_dot=m_dot, s_in=s_in, cp=cp, ea=ea, k0=k0, tau=tau)
 
-# 5. Visualización con Pestañas
+# Visualización con Pestañas
 tab_pareto, tab_sanity, tab_sensibilidad = st.tabs(
-    ["📈 Frontera de Pareto", "✅ Sanity Checks y Malla", "🧪 Sensibilidad"]
+    ["Frontera de Pareto", "Sanity Checks y Malla", "Sensibilidad"]
 )
 
 with tab_pareto:
@@ -205,7 +203,7 @@ with tab_pareto:
             st.plotly_chart(fig, use_container_width=True)
 
         with col_knee:
-            st.markdown("### 📍(Todo lobo cuida a su loba) Knee Point")
+            st.markdown("### Knee Point")
             st.info("Punto de equilibrio ideal: la mejor conversión posible con el menor consumo de energía.")
             st.metric("Temperatura $T_{in}$", f"{knee_point['Tin_K']:.1f} K", f"{knee_point['Tin_K']-273.15:.1f} °C")
             st.metric("Efectividad ε", f"{knee_point['epsilon']:.2f}")
