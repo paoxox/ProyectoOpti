@@ -195,13 +195,13 @@ with tab_pareto:
             st.plotly_chart(fig, use_container_width=True)
 
         with col_knee:
-            st.markdown("### 📍 Knee Point (Rodilla)")
-            st.info("Solución de compromiso óptima entre conversión y energía.")
-            st.metric("Temperatura T<sub>in</sub>", f"{knee_point['Tin_K']:.1f} K", f"{knee_point['Tin_K']-273.15:.1f} °C")
+            st.markdown("### 📍 Knee Point")
+            st.info("Punto de equilibrio ideal: la mejor conversión posible con el menor consumo de energía.")
+            st.metric("Temperatura $T_{in}$", f"{knee_point['Tin_K']:.1f} K", f"{knee_point['Tin_K']-273.15:.1f} °C")
             st.metric("Efectividad ε", f"{knee_point['epsilon']:.2f}")
-            st.metric("Conversión X<sub>s</sub>", f"{knee_point['Xs']*100:.3f}%")
+            st.metric("Conversión $X_{s}$", f"{knee_point['Xs']*100:.3f}%")
             st.metric("$S_{out}$", f"{knee_point['Sout_ppm']:.2f} ppm")
-            st.metric("Carga Horno Q<sub>horno</sub>", f"{knee_point['Q_horno_kW']:.2f} kW")
+            st.metric("Carga Horno $Q_{horno}$", f"{knee_point['Q_horno_kW']:.2f} kW")
 
 with tab_sanity:
     st.subheader("Sanity Checks (Valores Base)")
