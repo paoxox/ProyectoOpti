@@ -173,7 +173,7 @@ with tab_pareto:
 
             
             fig.add_trace(go.Scatter(x=df_infact["Q_horno_kW"], y=df_infact["Xs"]*100, mode="markers",
-                                     name="Infactibles (S<sub>out</sub> > 10)", marker=dict(color="#9CA3AF", size=5, opacity=0.6)))
+                                     name="Infactibles (S<sub>out</sub> > 10)", marker=dict(color="#341539", size=5, opacity=0.8)))
             
             fig.add_trace(go.Scatter(x=df_fact["Q_horno_kW"], y=df_fact["Xs"]*100, mode="markers",
                                      name="Factibles", marker=dict(color="#3B82F6", size=6, opacity=0.8),
