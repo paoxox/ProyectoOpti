@@ -1,1 +1,3 @@
 # ProyectoOpti
+
+AUXILIOOOOOOOOOOOOOOOO
