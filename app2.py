@@ -153,7 +153,6 @@ def calcular_malla_y_pareto(n_puntos=50, m_dot=100000.0, s_in=500.0, cp=2.5, ea=
 
     return df_grid, df_pareto, knee_point
 
-# Ejecutar grid search
 df_grid, df_pareto, knee_point = calcular_malla_y_pareto(m_dot=m_dot, s_in=s_in, cp=cp, ea=ea, k0=k0, tau=tau)
 
 # 5. Visualización con Pestañas
@@ -195,7 +194,7 @@ with tab_pareto:
             st.plotly_chart(fig, use_container_width=True)
 
         with col_knee:
-            st.markdown("### 📍 Knee Point")
+            st.markdown("### 📍(Todo lobo cuida a su loba) Knee Point")
             st.info("Punto de equilibrio ideal: la mejor conversión posible con el menor consumo de energía.")
             st.metric("Temperatura $T_{in}$", f"{knee_point['Tin_K']:.1f} K", f"{knee_point['Tin_K']-273.15:.1f} °C")
             st.metric("Efectividad ε", f"{knee_point['epsilon']:.2f}")
@@ -249,8 +248,8 @@ with tab_sensibilidad:
                 delta_s_pct = ((res["Sout_ppm"] - caso_base["Sout_ppm"]) / caso_base["Sout_ppm"] * 100.0) if caso_base["Sout_ppm"] > 0 else 0.0
 
                 filas.append({"Parámetro": nombre, "Perturbación": etiqueta, "Valor": f"{val_pert:.4g}", 
-                              "Qₕₒᵣₙₒ (kW)": round(res["Q_horno_kW"], 2), "ΔQₕₒᵣₙₒ (%)": round(delta_q_pct, 2),
-                              "Sₒᵤₜ (ppm)": round(res["Sout_ppm"], 3), "ΔSₒᵤₜ (%)": round(delta_s_pct, 2), "Factible": "Sí" if res["factible"] else "No"})
+                              "Qhorno (kW)": round(res["Q_horno_kW"], 2), "ΔQhorno (%)": round(delta_q_pct, 2),
+                              "Sout (ppm)": round(res["Sout_ppm"], 3), "ΔSout (%)": round(delta_s_pct, 2), "Factible": "Sí" if res["factible"] else "No"})
         return pd.DataFrame(filas)
 
     df_sens = calcular_sensibilidad(t_in, epsilon, m_dot, s_in, cp, ea, k0, tau)
