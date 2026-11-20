@@ -186,7 +186,7 @@ with tab_pareto:
                                      customdata=df_pareto[["Tin_K", "epsilon"]].values))
             
             fig.add_trace(go.Scatter(x=[knee_point["Q_horno_kW"]], y=[knee_point["Xs"]*100], mode="markers",
-                                     name="Knee Point", marker=dict(color="#FF006E", size=14, symbol="diamond", line=dict(color="white", width=2)),
+                                     name="Knee Point", marker=dict(color="#F5F5F5", size=14, symbol="circle", line=dict(color="gray", width=2)),
                                      hovertemplate="<b>Knee Point</b><br>Q<sub>horno</sub>: %{x:.1f} kW<br>X<sub>s</sub>: %{y:.2f}%<extra></extra>"))
 
             fig.update_layout(title="Optimización Multiobjetivo", xaxis_title="Carga Térmica Q<sub>horno</sub> (kW)",
