@@ -60,7 +60,7 @@ def evaluar_hds(t_in, epsilon, m_dot, s_in, cp, ea, k0, tau):
     }
 
 # Controles en barra lateral
-#with st.sidebar:
+with st.sidebar:
     st.header("Variables de decisión")
     t_in = st.slider("Temperatura entrada reactor $T_{in}$(K)", 550.0, 650.0, 600.0, 1.0)
     epsilon = st.slider("Efectividad intercambiador ε", 0.60, 0.90, 0.75, 0.01)
@@ -80,7 +80,7 @@ def evaluar_hds(t_in, epsilon, m_dot, s_in, cp, ea, k0, tau):
         value=float(k0_base),
         format="%.4e",
     )
-#
+
 # Evaluación del punto actual (Sidebar)
 res_actual = evaluar_hds(t_in, epsilon, m_dot, s_in, cp, ea, k0, tau)
 
