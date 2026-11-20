@@ -21,7 +21,7 @@ with col_titulo:
     st.title("Simulación y Optimización de Hidrodesulfuración (HDS)")
     st.caption(
         "Evaluación de conversión de azufre (Xs) y carga térmica del horno (Q_horno) "
-        "bajo restricción Sout ≤ 10 ppm."
+        "bajo restricción $S_{out}$ ≤ 10 ppm."
     )
 
 # Constantes fijas del modelo
