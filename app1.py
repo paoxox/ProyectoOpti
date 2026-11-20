@@ -3,9 +3,7 @@ import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 
-# ==========================================
 # 1. CONFIGURACIÓN DE PÁGINA Y ESTILOS
-# ==========================================
 st.set_page_config(
     page_title="Simulación y Optimización HDS",
     page_icon="⚗️", # Icono de la pestaña
@@ -59,9 +57,9 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# ==========================================
+
 # 2. FUNCIONES MATEMÁTICAS
-# ==========================================
+
 def calcular_k0(Ea, tau):
     R = 8.314
     return -np.log(1 - 0.985) / (tau * np.exp(-Ea / (R * 600)))
@@ -113,9 +111,7 @@ def calcular_pareto(Tin_arr, eps_arr, params):
         
     return df, df_pareto, knee_point
 
-# ==========================================
 # 3. CABECERA (Logo y Título)
-# ==========================================
 col_logo, col_title = st.columns([1, 8])
 with col_logo:
     # Puedes reemplazar esta URL por la ruta de tu propio logo, ej: "logo_ucv.png"
@@ -124,10 +120,10 @@ with col_title:
     st.title("Simulación y Optimización de Hidrodesulfuración (HDS)")
     st.markdown("**Curso de Optimización de Procesos — Ingeniería Química**")
 
-# ==========================================
+
 # 4. CONTROLES (Barra Lateral)
-# ==========================================
-st.sidebar.header("⚙️ Parámetros de Operación")
+
+st.sidebar.header("Parámetros de Operación")
 Tin_min, Tin_max = st.sidebar.slider("Rango de Temperatura Tin (K)", 550, 650, (550, 650))
 eps_min, eps_max = st.sidebar.slider("Rango de Efectividad ε", 0.60, 0.90, (0.60, 0.90), step=0.01)
 
@@ -210,7 +206,7 @@ with tab2:
     st.success(f"**Check 3 (ε → 1):** Tintercambiador = {Tint_3:.2f} K (≈ Tefluente = {Tef_3:.2f} K). "
                f"Q_horno = {Q_3:,.0f} kJ/h. *Interpretación: Q negativo indica excedente de calor.*")
 
-# --- PESTAÑA 3: SENSIBILIDAD (Requisito 5 del PDF) ---
+# --- PESTAÑA 3: SENSIBILIDAD ---
 with tab3:
     st.subheader("Análisis de Sensibilidad (±10%)")
     st.markdown("Evaluación del efecto de perturbar los parámetros en el **Punto de Rodilla** actual.")
