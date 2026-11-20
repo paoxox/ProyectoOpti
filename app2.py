@@ -64,14 +64,14 @@ with st.sidebar:
 
     st.header("Parámetros del modelo")
     m_dot = st.number_input("Flujo másico $ṁ$ ($kg/h$)", 90000.0, 110000.0, 100000.0, 1000.0)
-    s_in = st.number_input("$Azufre$ $alimentación$ $S_{in}$ ($ppm$)", 450.0, 550.0, 500.0, 5.0)
-    cp = st.number_input("$Capacidad calorífica$ $Cp_{}$ ($kJ/(kg·K)$)", 2.25, 2.75, 2.50, 0.05)
-    ea = st.number_input("$Energía de activación$ $Ea$ ($J/mol$)", 72000.0, 88000.0, 80000.0, 500.0)
-    tau = st.number_input("$Tiempo espacial$ τ ($h$)", 0.45, 0.55, 0.50, 0.01)
+    s_in = st.number_input("Azufre alimentación $S_{in}$ ($ppm$)", 450.0, 550.0, 500.0, 5.0)
+    cp = st.number_input("Capacidad calorífica $Cp_{}$ ($kJ/(kg·K)$)", 2.25, 2.75, 2.50, 0.05)
+    ea = st.number_input("Energía de activación $Ea$ ($J/mol$)", 72000.0, 88000.0, 80000.0, 500.0)
+    tau = st.number_input("Tiempo espacial τ ($h$)", 0.45, 0.55, 0.50, 0.01)
 
     k0_base = calcular_k0(ea=ea, tau=tau)
     k0 = st.number_input(
-        "$Factor preexponencial$ $k_{o}$ ($h⁻¹$)",
+        "Factor preexponencial $k_{o}$ ($h⁻¹$)",
         min_value=float(k0_base * 0.90),
         max_value=float(k0_base * 1.10),
         value=float(k0_base),
@@ -172,20 +172,20 @@ with tab_pareto:
             df_fact = df_grid[df_grid["factible"]]
             df_infact = df_grid[~df_grid["factible"]]
 
-            # Puntos Infactibles
+            
             fig.add_trace(go.Scatter(x=df_infact["Q_horno_kW"], y=df_infact["Xs"]*100, mode="markers",
                                      name="Infactibles (S<sub>out</sub> > 10)", marker=dict(color="rgba(200, 200, 200, 0.3)", size=4)))
-            # Puntos Factibles
+            
             fig.add_trace(go.Scatter(x=df_fact["Q_horno_kW"], y=df_fact["Xs"]*100, mode="markers",
                                      name="Factibles", marker=dict(color="#A0C4FF", size=5, opacity=0.6),
-                                     hovertemplate="Q<sub>horno</sub>: %{x:.1f} kW<br>X<sub>s</sub>: %{y:.2f}%<br>T<sub>in</sub>: %{customdata[0]:.1f} K<br>ε: %{customdata[1]:.2f}<extra></extra>",
+                                     hovertemplate="$Q_{horno}$: %{x:.1f} kW<br>X<sub>s</sub>: %{y:.2f}%<br>T<sub>in</sub>: %{customdata[0]:.1f} K<br>ε: %{customdata[1]:.2f}<extra></extra>",
                                      customdata=df_fact[["Tin_K", "epsilon"]].values))
-            # Frontera
+            
             fig.add_trace(go.Scatter(x=df_pareto["Q_horno_kW"], y=df_pareto["Xs"]*100, mode="lines+markers",
                                      name="Frontera de Pareto", line=dict(color="#023E8A", width=3), marker=dict(color="#023E8A", size=5),
                                      hovertemplate="<b>Pareto</b><br>Q<sub>horno</sub>: %{x:.1f} kW<br>X<sub>s</sub>: %{y:.2f}%<br>T<sub>in</sub>: %{customdata[0]:.1f} K<br>ε: %{customdata[1]:.2f}<extra></extra>",
                                      customdata=df_pareto[["Tin_K", "epsilon"]].values))
-            # Knee Point (Punto de compromiso, sin la "estrella cochina")
+            
             fig.add_trace(go.Scatter(x=[knee_point["Q_horno_kW"]], y=[knee_point["Xs"]*100], mode="markers",
                                      name="Knee Point", marker=dict(color="#FF006E", size=14, symbol="diamond", line=dict(color="white", width=2)),
                                      hovertemplate="<b>Knee Point</b><br>Q<sub>horno</sub>: %{x:.1f} kW<br>X<sub>s</sub>: %{y:.2f}%<extra></extra>"))
