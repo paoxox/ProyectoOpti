@@ -83,9 +83,9 @@ res_actual = evaluar_hds(t_in, epsilon, m_dot, s_in, cp, ea, k0, tau)
 
 st.subheader("Punto operativo seleccionado")
 if res_actual["factible"]:
-    st.success(f"Cumple especificación de calidad: Este Sout es una mielda Sout = {res_actual['Sout_ppm']:.2f} ppm (≤ 10 ppm).", icon="✅")
+    st.success(f"Cumple especificación de calidad: Sₒᵤₜ  = {res_actual['Sout_ppm']:.2f} ppm (≤ 10 ppm).", icon="✅")
 else:
-    st.warning(f"No cumple especificación de calidad: Sout = {res_actual['Sout_ppm']:.2f} ppm (> 10 ppm).", icon="⚠️")
+    st.warning(f"No cumple especificación de calidad: Sₒᵤₜ  = {res_actual['Sout_ppm']:.2f} ppm (> 10 ppm).", icon="⚠️")
 
 # Etiquetas con subíndices HTML (formato exacto de la imagen)
 c1, c2, c3, c4 = st.columns(4)
