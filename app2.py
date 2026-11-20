@@ -8,7 +8,12 @@ st.set_page_config(
     page_title="Simulación y Optimización de HDS",
     page_icon="⚗️",
     layout="wide",
-    initial_sidebar_state="auto",
+    initial_sidebar_state="expanded",
+    menu_items = {
+        "Get help": "https://docs.streamlit.io"
+        "Report a bug": None,
+        "About": "Sección interna de simulación, versión 1.0",
+    },
 )
 
 # Configuración de logo y texto
