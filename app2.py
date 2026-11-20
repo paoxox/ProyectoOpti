@@ -190,7 +190,7 @@ with tab_pareto:
                                      hovertemplate="<b>Knee Point</b><br>Q<sub>horno</sub>: %{x:.1f} kW<br>X<sub>s</sub>: %{y:.2f}%<extra></extra>"))
 
             fig.update_layout(title="Optimización Multiobjetivo", xaxis_title="Carga Térmica Q<sub>horno</sub> (kW)",
-                              yaxis_title="Conversión X<sub>s</sub> (%)", legend=dict(x=0.01, y=0.01, bgcolor="rgba(255,255,255,0.8)"), height=500)
+                              yaxis_title="Conversión X<sub>s</sub> (%)", legend=dict(x=0.01, y=0.01, bgcolor="rgba(192,132,252,0.8)"), height=500)
             st.plotly_chart(fig, use_container_width=True)
 
         with col_knee:
