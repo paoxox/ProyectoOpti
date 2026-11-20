@@ -176,8 +176,8 @@ with tab_pareto:
                                      name="Infactibles (S<sub>out</sub> > 10)", marker=dict(color="#80EF80", size=5, opacity=0.6)))
             
             fig.add_trace(go.Scatter(x=df_fact["Q_horno_kW"], y=df_fact["Xs"]*100, mode="markers",
-                                     name="Factibles", marker=dict(color="#50C878", size=4, opacity=0.8),
-                                     hovertemplate="$Q_{horno}$: %{x:.1f} kW<br>X<sub>s</sub>: %{y:.2f}%<br>T<sub>in</sub>: %{customdata[0]:.1f} K<br>ε: %{customdata[1]:.2f}<extra></extra>",
+                                     name="Factibles", marker=dict(color="#0E7490", size=4, opacity=0.8),
+                                     hovertemplate="Qhorno: %{x:.1f} kW<br>X<sub>s</sub>: %{y:.2f}%<br>T<sub>in</sub>: %{customdata[0]:.1f} K<br>ε: %{customdata[1]:.2f}<extra></extra>",
                                      customdata=df_fact[["Tin_K", "epsilon"]].values))
             
             fig.add_trace(go.Scatter(x=df_pareto["Q_horno_kW"], y=df_pareto["Xs"]*100, mode="lines+markers",
