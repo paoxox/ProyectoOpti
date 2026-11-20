@@ -6,7 +6,7 @@ import plotly.graph_objects as go
 # 1. Configuración general de la página
 st.set_page_config(
     page_title="Simulación y Optimización de HDS",
-    page_icon="⚗️", # Icono de la pestaña
+    page_icon="⚗️",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -25,21 +25,18 @@ with col_titulo:
     )
 
 # Constantes fijas del modelo
-R_GAS = 8.314  # J/(mol*K)
-T_ALIM = 300.0  # K
+R_GAS = 8.314
+T_ALIM = 300.0
 X_CALIB = 0.985
-T_CALIB = 600.0  # K
-TAU_CALIB = 0.5  # h
-EA_CALIB = 80000.0  # J/mol
-DT_AD_MAX = 15.0  # K a conversión completa (Xs = 1)
+T_CALIB = 600.0
+TAU_CALIB = 0.5
+EA_CALIB = 80000.0
+DT_AD_MAX = 15.0
 
 def calcular_k0(ea: float = EA_CALIB, tau: float = TAU_CALIB, x_ref: float = X_CALIB, t_ref: float = T_CALIB) -> float:
-    """Calcula el factor preexponencial calibrado k0 [h^-1]."""
     return -np.log(1.0 - x_ref) / (tau * np.exp(-ea / (R_GAS * t_ref)))
 
 def evaluar_hds(t_in, epsilon, m_dot, s_in, cp, ea, k0, tau):
-    """Evalúa cinética, calidad de nafta, balance térmico y carga del horno.
-    Acepta floats o arrays de NumPy para cálculos vectorizados."""
     k_t = k0 * np.exp(-ea / (R_GAS * t_in))
     x_s = 1.0 - np.exp(-k_t * tau)
     s_out = s_in * (1.0 - x_s)
@@ -86,23 +83,22 @@ res_actual = evaluar_hds(t_in, epsilon, m_dot, s_in, cp, ea, k0, tau)
 
 st.subheader("Punto operativo seleccionado")
 if res_actual["factible"]:
-    st.success(f"Cumple especificación de calidad: Sout = {res_actual['Sout_ppm']:.2f} ppm (≤ 10 ppm).")
+    st.success(f"Cumple especificación de calidad: S<sub>out</sub> = {res_actual['Sout_ppm']:.2f} ppm (≤ 10 ppm).", icon="✅")
 else:
-    st.warning(f"No cumple especificación de calidad: Sout = {res_actual['Sout_ppm']:.2f} ppm (> 10 ppm).")
+    st.warning(f"No cumple especificación de calidad: S<sub>out</sub> = {res_actual['Sout_ppm']:.2f} ppm (> 10 ppm).", icon="⚠️")
 
-# Ajuste en las etiquetas para que no se trunquen y se vean limpias
+# Etiquetas con subíndices HTML (formato exacto de la imagen)
 c1, c2, c3, c4 = st.columns(4)
-c1.metric("Conversión Xs (%)", f"{res_actual['Xs']*100:.2f}%")
-c2.metric("Azufre salida Sout (ppm)", f"{res_actual['Sout_ppm']:.2f}")
-c3.metric("Carga horno Q_horno (kW)", f"{res_actual['Q_horno_kW']:.2f}")
-c4.metric("Carga horno Q_horno (kJ/h)", f"{res_actual['Q_horno_kJ_h']/1e6:.2f} M") # Formateado a millones para que no se corte
+c1.metric("Conversión X<sub>s</sub>", f"{res_actual['Xs']*100:.2f}%")
+c2.metric("Azufre salida S<sub>out</sub>", f"{res_actual['Sout_ppm']:.2f} ppm", delta_color="inverse")
+c3.metric("Carga horno Q<sub>horno</sub>", f"{res_actual['Q_horno_kW']:.2f} kW")
+c4.metric("Carga horno Q<sub>horno</sub>", f"{res_actual['Q_horno_kJ_h']:,.0f} kJ/h") # Corregido para que no se corte
 
 st.markdown("---")
 
 # 4. Generación de la Malla (Grid Search) y Pareto VECTORIZADO
 @st.cache_data
 def calcular_malla_y_pareto(n_puntos=50, m_dot=100000.0, s_in=500.0, cp=2.5, ea=EA_CALIB, k0=None, tau=TAU_CALIB):
-    """Genera el dominio completo usando vectorización de NumPy (Rápido)."""
     grid_tin = np.linspace(550.0, 650.0, n_puntos)
     grid_eps = np.linspace(0.60, 0.90, n_puntos)
     T_grid, E_grid = np.meshgrid(grid_tin, grid_eps)
@@ -176,40 +172,36 @@ with tab_pareto:
             df_fact = df_grid[df_grid["factible"]]
             df_infact = df_grid[~df_grid["factible"]]
 
-            # Puntos Infactibles (Gris muy tenue)
+            # Puntos Infactibles
             fig.add_trace(go.Scatter(x=df_infact["Q_horno_kW"], y=df_infact["Xs"]*100, mode="markers",
-                                     name="Infactibles (Sout > 10)", marker=dict(color="rgba(200, 200, 200, 0.3)", size=4)))
-            
-            # Puntos Factibles (Azul claro)
+                                     name="Infactibles (S<sub>out</sub> > 10)", marker=dict(color="rgba(200, 200, 200, 0.3)", size=4)))
+            # Puntos Factibles
             fig.add_trace(go.Scatter(x=df_fact["Q_horno_kW"], y=df_fact["Xs"]*100, mode="markers",
                                      name="Factibles", marker=dict(color="#A0C4FF", size=5, opacity=0.6),
-                                     hovertemplate="Q: %{x:.1f} kW<br>Xs: %{y:.2f}%<br>Tin: %{customdata[0]:.1f} K<br>ε: %{customdata[1]:.2f}<extra></extra>",
+                                     hovertemplate="Q<sub>horno</sub>: %{x:.1f} kW<br>X<sub>s</sub>: %{y:.2f}%<br>T<sub>in</sub>: %{customdata[0]:.1f} K<br>ε: %{customdata[1]:.2f}<extra></extra>",
                                      customdata=df_fact[["Tin_K", "epsilon"]].values))
-            
-            # Frontera de Pareto (Azul oscuro sólido)
+            # Frontera
             fig.add_trace(go.Scatter(x=df_pareto["Q_horno_kW"], y=df_pareto["Xs"]*100, mode="lines+markers",
                                      name="Frontera de Pareto", line=dict(color="#023E8A", width=3), marker=dict(color="#023E8A", size=5),
-                                     hovertemplate="<b>Pareto</b><br>Q: %{x:.1f} kW<br>Xs: %{y:.2f}%<br>Tin: %{customdata[0]:.1f} K<br>ε: %{customdata[1]:.2f}<extra></extra>",
+                                     hovertemplate="<b>Pareto</b><br>Q<sub>horno</sub>: %{x:.1f} kW<br>X<sub>s</sub>: %{y:.2f}%<br>T<sub>in</sub>: %{customdata[0]:.1f} K<br>ε: %{customdata[1]:.2f}<extra></extra>",
                                      customdata=df_pareto[["Tin_K", "epsilon"]].values))
-            
-            # Knee Point (Reemplazada la estrella por un rombo llamativo)
+            # Knee Point (Punto de compromiso, sin la "estrella cochina")
             fig.add_trace(go.Scatter(x=[knee_point["Q_horno_kW"]], y=[knee_point["Xs"]*100], mode="markers",
                                      name="Knee Point", marker=dict(color="#FF006E", size=14, symbol="diamond", line=dict(color="white", width=2)),
-                                     hovertemplate="<b>Knee Point</b><br>Q: %{x:.1f} kW<br>Xs: %{y:.2f}%<extra></extra>"))
+                                     hovertemplate="<b>Knee Point</b><br>Q<sub>horno</sub>: %{x:.1f} kW<br>X<sub>s</sub>: %{y:.2f}%<extra></extra>"))
 
-            fig.update_layout(title="Optimización Multiobjetivo", xaxis_title="Carga Térmica Q_horno (kW)",
-                              yaxis_title="Conversión Xs (%)", legend=dict(x=0.01, y=0.01, bgcolor="rgba(255,255,255,0.8)"), height=500)
+            fig.update_layout(title="Optimización Multiobjetivo", xaxis_title="Carga Térmica Q<sub>horno</sub> (kW)",
+                              yaxis_title="Conversión X<sub>s</sub> (%)", legend=dict(x=0.01, y=0.01, bgcolor="rgba(255,255,255,0.8)"), height=500)
             st.plotly_chart(fig, use_container_width=True)
 
         with col_knee:
             st.markdown("### 📍 Knee Point (Rodilla)")
             st.info("Solución de compromiso óptima entre conversión y energía.")
-            # Etiquetas limpias y sin abreviaciones confusas
-            st.metric("Temperatura Tin (K)", f"{knee_point['Tin_K']:.1f}", f"{knee_point['Tin_K']-273.15:.1f} °C")
+            st.metric("Temperatura T<sub>in</sub>", f"{knee_point['Tin_K']:.1f} K", f"{knee_point['Tin_K']-273.15:.1f} °C")
             st.metric("Efectividad ε", f"{knee_point['epsilon']:.2f}")
-            st.metric("Conversión Xs (%)", f"{knee_point['Xs']*100:.3f}%")
-            st.metric("Sout (ppm)", f"{knee_point['Sout_ppm']:.2f} ppm")
-            st.metric("Carga Horno Q_horno (kW)", f"{knee_point['Q_horno_kW']:.2f} kW")
+            st.metric("Conversión X<sub>s</sub>", f"{knee_point['Xs']*100:.3f}%")
+            st.metric("S<sub>out</sub>", f"{knee_point['Sout_ppm']:.2f} ppm")
+            st.metric("Carga Horno Q<sub>horno</sub>", f"{knee_point['Q_horno_kW']:.2f} kW")
 
 with tab_sanity:
     st.subheader("Sanity Checks (Valores Base)")
@@ -218,10 +210,11 @@ with tab_sanity:
     sc2 = evaluar_hds(t_in=550.0, epsilon=0.75, m_dot=100000.0, s_in=500.0, cp=2.5, ea=80000.0, k0=calcular_k0(80000.0, 0.5), tau=0.5)
     sc3 = evaluar_hds(t_in=600.0, epsilon=0.999999, m_dot=100000.0, s_in=500.0, cp=2.5, ea=80000.0, k0=calcular_k0(80000.0, 0.5), tau=0.5)
 
+    # En tablas usamos caracteres Unicode para los subíndices (Xₛ, Sₒᵤₜ, Qₕₒᵣₙₒ) ya que Dataframe no lee HTML
     df_sanity = pd.DataFrame([
-        {"Caso": "1) Tin = 650 K, ε = 0.90", "Xs": f"{sc1['Xs']:.4f}", "Sout (ppm)": f"{sc1['Sout_ppm']:.4f}", "Factible": "Sí" if sc1["factible"] else "No", "Q_horno (kW)": f"{sc1['Q_horno_kW']:.2f}"},
-        {"Caso": "2) Tin = 550 K, ε = 0.75", "Xs": f"{sc2['Xs']:.4f}", "Sout (ppm)": f"{sc2['Sout_ppm']:.4f}", "Factible": "Sí" if sc2["factible"] else "No", "Q_horno (kW)": f"{sc2['Q_horno_kW']:.2f}"},
-        {"Caso": "3) Límite ε → 1 (Tin = 600 K)", "Xs": f"{sc3['Xs']:.4f}", "Sout (ppm)": f"{sc3['Sout_ppm']:.4f}", "Factible": "Sí" if sc3["factible"] else "No", "Q_horno (kW)": f"{sc3['Q_horno_kW']:.2f}"},
+        {"Caso": "1) Tin = 650 K, ε = 0.90", "Xₛ": f"{sc1['Xs']:.4f}", "Sₒᵤₜ (ppm)": f"{sc1['Sout_ppm']:.4f}", "Factible": "Sí" if sc1["factible"] else "No", "Qₕₒᵣₙₒ (kW)": f"{sc1['Q_horno_kW']:.2f}"},
+        {"Caso": "2) Tin = 550 K, ε = 0.75", "Xₛ": f"{sc2['Xs']:.4f}", "Sₒᵤₜ (ppm)": f"{sc2['Sout_ppm']:.4f}", "Factible": "Sí" if sc2["factible"] else "No", "Qₕₒᵣₙₒ (kW)": f"{sc2['Q_horno_kW']:.2f}"},
+        {"Caso": "3) Límite ε → 1 (Tin = 600 K)", "Xₛ": f"{sc3['Xs']:.4f}", "Sₒᵤₜ (ppm)": f"{sc3['Sout_ppm']:.4f}", "Factible": "Sí" if sc3["factible"] else "No", "Qₕₒᵣₙₒ (kW)": f"{sc3['Q_horno_kW']:.2f}"},
     ])
     st.dataframe(df_sanity, use_container_width=True, hide_index=True)
     
@@ -257,8 +250,8 @@ with tab_sensibilidad:
                 delta_s_pct = ((res["Sout_ppm"] - caso_base["Sout_ppm"]) / caso_base["Sout_ppm"] * 100.0) if caso_base["Sout_ppm"] > 0 else 0.0
 
                 filas.append({"Parámetro": nombre, "Perturbación": etiqueta, "Valor": f"{val_pert:.4g}", 
-                              "Q_horno (kW)": round(res["Q_horno_kW"], 2), "ΔQ (%)": round(delta_q_pct, 2),
-                              "Sout (ppm)": round(res["Sout_ppm"], 3), "ΔSout (%)": round(delta_s_pct, 2), "Factible": "Sí" if res["factible"] else "No"})
+                              "Qₕₒᵣₙₒ (kW)": round(res["Q_horno_kW"], 2), "ΔQₕₒᵣₙₒ (%)": round(delta_q_pct, 2),
+                              "Sₒᵤₜ (ppm)": round(res["Sout_ppm"], 3), "ΔSₒᵤₜ (%)": round(delta_s_pct, 2), "Factible": "Sí" if res["factible"] else "No"})
         return pd.DataFrame(filas)
 
     df_sens = calcular_sensibilidad(t_in, epsilon, m_dot, s_in, cp, ea, k0, tau)
