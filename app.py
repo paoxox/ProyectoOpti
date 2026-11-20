@@ -212,8 +212,6 @@ df_sanity = pd.DataFrame([
 ])
 
 import plotly.graph_objects as go
-
-
 # 5. Generación de la Malla (Grid Search) y Pareto
 @st.cache_data
 def calcular_malla_y_pareto(
@@ -275,7 +273,6 @@ def calcular_malla_y_pareto(
   xs_min, xs_max = df_pareto["obj_xs"].min(), df_pareto["obj_xs"].max()
   q_min, q_max = df_pareto["obj_q"].min(), df_pareto["obj_q"].max()
 
-  # Evitar división por cero
   denom_xs = (xs_max - xs_min) if (xs_max - xs_min) > 0 else 1.0
   denom_q = (q_max - q_min) if (q_max - q_min) > 0 else 1.0
 
@@ -283,25 +280,25 @@ def calcular_malla_y_pareto(
   df_pareto["xs_norm"] = (df_pareto["obj_xs"] - xs_min) / denom_xs
   df_pareto["q_norm"] = (df_pareto["obj_q"] - q_min) / denom_q
 
-  # Puntos extremos normalizados A y B
-  p1 = np.array([
-      df_pareto.iloc[0]["xs_norm"],
-      df_pareto.iloc[0]["q_norm"],
-  ])
-  p2 = np.array([
-      df_pareto.iloc[-1]["xs_norm"],
-      df_pareto.iloc[-1]["q_norm"],
-  ])
+  # Puntos extremos normalizados (x1, y1) y (x2, y2)
+  x1, y1 = df_pareto.iloc[0]["xs_norm"], df_pareto.iloc[0]["q_norm"]
+  x2, y2 = df_pareto.iloc[-1]["xs_norm"], df_pareto.iloc[-1]["q_norm"]
 
-  # Distancia perpendicular de cada punto a la recta p1-p2
+  # Ecuación de la recta en 2D: (y2 - y1)*x - (x2 - x1)*y + (x2*y1 - y2*x1) = 0
+  # ax + by + c = 0
+  a = y2 - y1
+  b = -(x2 - x1)
+  c = x2 * y1 - y2 * x1
+  norma = np.sqrt(a**2 + b**2)
+
   distancias = []
   for _, row in df_pareto.iterrows():
-    p0 = np.array([row["xs_norm"], row["q_norm"]])
-    # Fórmula de distancia perpendicular de un punto a una recta en 2D
-    if np.all(p1 == p2):
+    x0, y0 = row["xs_norm"], row["q_norm"]
+    if norma == 0:
       d = 0.0
     else:
-      d = np.abs(np.cross(p2 - p1, p1 - p0)) / np.linalg.norm(p2 - p1)
+      # Distancia de un punto (x0, y0) a la recta ax + by + c = 0
+      d = abs(a * x0 + b * y0 + c) / norma
     distancias.append(d)
 
   df_pareto["distancia_knee"] = distancias
@@ -309,7 +306,6 @@ def calcular_malla_y_pareto(
   knee_point = df_pareto.loc[idx_knee].to_dict()
 
   return df_grid, df_pareto, knee_point
-
 
 # Generar malla y Pareto con parámetros de la barra lateral
 df_grid, df_pareto, knee_point = calcular_malla_y_pareto(
